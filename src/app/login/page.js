@@ -6,16 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AuthApiClient } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
 
 const LoginRegister = () => {
   const [error, setError] = useState("");
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginData, setLoginData] = useState({ phone: "", password: "" });
   const [registerData, setRegisterData] = useState({
     name: "",
-    email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
+
+  const router = useRouter();
 
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -27,19 +31,31 @@ const LoginRegister = () => {
     setError("");
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!loginData.email || !loginData.password) {
+    const { phone, password } = loginData;
+
+    if (!phone || !password) {
       setError("Please fill in all login fields.");
       return;
     }
-    console.log("Login", loginData);
+
+    try {
+      const res = await AuthApiClient.login({ phone, password });
+      localStorage.setItem("token", res.token);
+      router.push("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
+    }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, confirmPassword } = registerData;
-    if (!name || !email || !password || !confirmPassword) {
+    const { name, phone, password, confirmPassword } = registerData;
+
+    if (!name || !phone || !password || !confirmPassword) {
       setError("Please fill in all registration fields.");
       return;
     }
@@ -47,26 +63,30 @@ const LoginRegister = () => {
       setError("Passwords do not match.");
       return;
     }
-    console.log("Register", registerData);
+
+    try {
+      await AuthApiClient.register({ name, phone, password });
+      const res = await AuthApiClient.login({ phone, password }); // auto-login
+      localStorage.setItem("token", res.token);
+      router.push("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Registration failed. Try again."
+      );
+    }
   };
 
   return (
     <section className="relative min-h-screen w-full">
-      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('/international-logistics.1.14.avif')",
         }}
       />
-
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-      {/* Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-10">
         <div className="bg-white/90 backdrop-blur-lg border border-gray-200 rounded-2xl shadow-2xl max-w-md w-full p-8">
-          {/* Optional: Brand heading */}
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-6 tracking-tight">
             Welcome to <span className="text-yellow-500">SV Supply Chain</span>
           </h1>
@@ -103,14 +123,14 @@ const LoginRegister = () => {
             <TabsContent value="login">
               <form onSubmit={handleLoginSubmit} className="space-y-5">
                 <div>
-                  <Label htmlFor="loginEmail">Email</Label>
+                  <Label htmlFor="loginPhone">Phone</Label>
                   <Input
-                    id="loginEmail"
-                    type="email"
-                    name="email"
-                    value={loginData.email}
+                    id="loginPhone"
+                    type="text"
+                    name="phone"
+                    value={loginData.phone}
                     onChange={handleLoginChange}
-                    placeholder="you@example.com"
+                    placeholder="Enter your phone number"
                     className="mt-1"
                   />
                 </div>
@@ -151,14 +171,14 @@ const LoginRegister = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="registerEmail">Email</Label>
+                  <Label htmlFor="registerPhone">Phone</Label>
                   <Input
-                    id="registerEmail"
-                    type="email"
-                    name="email"
-                    value={registerData.email}
+                    id="registerPhone"
+                    type="text"
+                    name="phone"
+                    value={registerData.phone}
                     onChange={handleRegisterChange}
-                    placeholder="you@example.com"
+                    placeholder="Enter your phone number"
                     className="mt-1"
                   />
                 </div>
