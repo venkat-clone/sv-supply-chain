@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: RolePermission API
+  version: 1.0.0
+  description: API for managing RolePermission data
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /rolepermission:
+    get:
+      summary: Get all RolePermission
+      tags: [RolePermission]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of RolePermission
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RolePermission'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+    post:
+      summary: Create a new RolePermission
+      tags: [RolePermission]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePermissionCreation'
+      responses:
+        '201':
+          description: RolePermission created
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+  /rolepermission/{id}:
+    get:
+      summary: Get RolePermission by ID
+      tags: [RolePermission]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A RolePermission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolePermission'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+    put:
+      summary: Update RolePermission
+      tags: [RolePermission]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePermissionCreation'
+      responses:
+        '200':
+          description: RolePermission updated
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    DefaultResponse:
+      description: Default error response
+  schemas:
+    RolePermission:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          type: integer
+        roleId:
+          type: integer
+        permission:
+          type: integer
+        permissionId:
+          type: integer
+      required:
+        - id
+        - role
+        - permission
+    RolePermissionCreation:
+      type: object
+      properties:
+        roleId:
+          type: integer
+        permissionId:
+          type: integer
+      required:
+        - id
+        - role
+        - permission

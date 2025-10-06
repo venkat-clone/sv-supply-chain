@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Permission API
+  version: 1.0.0
+  description: API for managing Permission data
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /permission:
+    get:
+      summary: Get all Permission
+      tags: [Permission]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of Permission
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+    post:
+      summary: Create a new Permission
+      tags: [Permission]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionCreation'
+      responses:
+        '201':
+          description: Permission created
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+  /permission/{id}:
+    get:
+      summary: Get Permission by ID
+      tags: [Permission]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A Permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+    put:
+      summary: Update Permission
+      tags: [Permission]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionCreation'
+      responses:
+        '200':
+          description: Permission updated
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    DefaultResponse:
+      description: Default error response
+  schemas:
+    Permission:
+      type: object
+      properties:
+        id:
+          type: integer
+        action:
+          type: string
+        description:
+          type: string
+        roles:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - roles
+    PermissionCreation:
+      type: object
+      properties:
+        action:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - roles

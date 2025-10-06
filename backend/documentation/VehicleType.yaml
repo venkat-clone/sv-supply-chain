@@ -1,0 +1,138 @@
+openapi: 3.0.3
+info:
+  title: VehicleType API
+  version: 1.0.0
+  description: API for managing VehicleType data
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /vehicletype:
+    get:
+      summary: Get all VehicleType
+      tags: [VehicleType]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of VehicleType
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleType'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+    post:
+      summary: Create a new VehicleType
+      tags: [VehicleType]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleTypeCreation'
+      responses:
+        '201':
+          description: VehicleType created
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+  /vehicletype/{id}:
+    get:
+      summary: Get VehicleType by ID
+      tags: [VehicleType]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A VehicleType
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleType'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+    put:
+      summary: Update VehicleType
+      tags: [VehicleType]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleTypeCreation'
+      responses:
+        '200':
+          description: VehicleType updated
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    DefaultResponse:
+      description: Default error response
+  schemas:
+    VehicleType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        minLoadCapacity:
+          type: number
+        maxLoadCapacity:
+          type: number
+        minDistance:
+          type: number
+        maxDistance:
+          type: number
+        description:
+          type: string
+        vehicles:
+          type: integer
+      required:
+        - id
+        - vehicles
+    VehicleTypeCreation:
+      type: object
+      properties:
+        name:
+          type: string
+        minLoadCapacity:
+          type: number
+        maxLoadCapacity:
+          type: number
+        minDistance:
+          type: number
+        maxDistance:
+          type: number
+        description:
+          type: string
+      required:
+        - id
+        - vehicles

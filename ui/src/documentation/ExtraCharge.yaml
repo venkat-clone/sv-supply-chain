@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: ExtraCharge API
+  version: 1.0.0
+  description: API for managing ExtraCharge data
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /extracharge:
+    get:
+      summary: Get all ExtraCharge
+      tags: [ExtraCharge]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of ExtraCharge
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtraCharge'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+    post:
+      summary: Create a new ExtraCharge
+      tags: [ExtraCharge]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtraChargeCreation'
+      responses:
+        '201':
+          description: ExtraCharge created
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+  /extracharge/{id}:
+    get:
+      summary: Get ExtraCharge by ID
+      tags: [ExtraCharge]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A ExtraCharge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtraCharge'
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+    put:
+      summary: Update ExtraCharge
+      tags: [ExtraCharge]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtraChargeCreation'
+      responses:
+        '200':
+          description: ExtraCharge updated
+        'default':
+          $ref: '#/components/responses/DefaultResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    DefaultResponse:
+      description: Default error response
+  schemas:
+    ExtraCharge:
+      type: object
+      properties:
+        id:
+          type: integer
+        order:
+          type: integer
+        orderId:
+          type: integer
+        title:
+          type: string
+        amount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - order
+    ExtraChargeCreation:
+      type: object
+      properties:
+        orderId:
+          type: integer
+        title:
+          type: string
+        amount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - order
