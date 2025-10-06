@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User {
+  // Common fields
+  id     Int    @id @default(autoincrement())
+  name   String
+  phone  String // No Unique for Driver to use the App as An Customer
+  roleId Int
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  // User fields
+  orders    Order[]    @relation("CustomerOrders")
+  //  Driver 
+  vehicle   Vehicle[]  @relation("DriverVehicle")
+  rides     Order[]    @relation("DriverOrders")
+  address   String?
+  Location  Location[]
+  password String?
+  createdAt DateTime   @default(now())
+
+  @@unique([phone, roleId])
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  description String?
+  users       User[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now())
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement())
+  action      String
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now())
+}
+
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       Int
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+}
+
+// 🚚 ORDER SYSTEM
+
+model Order {
+  id         Int  @id @default(autoincrement())
+  customer   User @relation("CustomerOrders", fields: [customerId], references: [id])
+  customerId Int
+
+  driver   User? @relation("DriverOrders", fields: [driverId], references: [id])
+  driverId Int?
+
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+  vehicleId Int?
+
+  fromLocation   Location @relation("FromLocation", fields: [fromLocationId], references: [id])
+  fromLocationId Int
+
+  toLocation   Location @relation("ToLocation", fields: [toLocationId], references: [id])
+  toLocationId Int
+
+  loadTons          Float
+  status            OrderStatus 
+  estimatedDistance Float?
+  // this customer dont need
+  traveledDistance  Float?
+  extraDistance     Float?
+
+  requestedAt       DateTime          @default(now())
+  deliveredAt       DateTime?
+  charges           ExtraCharge[]
+  totalCharge       Float?
+  transactionStatus TransactionStatus?
+}
+
+model Location {
+  id        Int     @id @default(autoincrement())
+  name      String
+  address   String
+  pincode   String?
+  latitude  Float?
+  longitude Float?
+
+  contact   User @relation(fields: [contactId], references: [id])
+  contactId Int
+
+  sentOrders     Order[] @relation("FromLocation")
+  receivedOrders Order[] @relation("ToLocation")
+}
+
+
+model ExtraCharge {
+  id      Int   @id @default(autoincrement())
+  order   Order @relation(fields: [orderId], references: [id])
+  orderId Int
+
+  title     String
+  amount    Float
+  createdAt DateTime @default(now())
+}
+
+model Vehicle {
+  id     Int    @id @default(autoincrement())
+  name   String
+  number String @unique
+
+  type   VehicleType? @relation(fields: [typeId], references: [id])
+  typeId Int?
+
+  capacityTons Float?
+  owned        Boolean? @default(false)
+  isAvailable  Boolean? @default(true)
+
+  provider      String?
+  contact       String?
+  currentStatus String?
+
+  createdAt DateTime @default(now())
+  orders    Order[]
+
+  drivers User[] @relation("DriverVehicle")
+}
+
+model VehicleType {
+  id              Int     @id @default(autoincrement())
+  name            String
+  minLoadCapacity Float
+  maxLoadCapacity Float
+  minDistance     Float
+  maxDistance     Float
+  description     String?
+
+  vehicles Vehicle[]
+}
+
+enum OrderStatus {
+  REQUESTED
+  ASSIGNED
+  ENROUTE
+  DELIVERED
+  CANCELLED
+}
+
+enum TransactionType {
+  CUSTOMER_PAYMENT
+  DRIVER_PAYMENT
+  FUEL
+  TOLL
+  OTHER
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
