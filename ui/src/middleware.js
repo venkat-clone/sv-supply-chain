@@ -4,11 +4,11 @@ import {parse} from "cookie";
 import { verifyToken, getTokenFromHeader } from "./utils/authUtils";
 import {AuthApiClient} from "@/lib/api/auth";
 
-export function middleware(request) {
+export async function middleware(request) {
   const cookiesHeader = request.headers.get("cookie");
   const cookiesObject = cookiesHeader ? parse(cookiesHeader) : {};
   const token = cookiesObject.token;
-  const user = token ? verifyToken(token) : null;
+  const user = token ? await verifyToken(token) : null;
 
   const isProtected = request.nextUrl.pathname.startsWith("/dashboard");
 
@@ -19,7 +19,29 @@ export function middleware(request) {
 
   // Optionally attach user info
   if (user) {
-    request.headers.set("x-user-id", user.id);
+    // get user info from API
+    try{
+      const user = await AuthApiClient.getProfile(token);
+      console.log('trying to redirect',request.nextUrl.pathname);
+
+      const roleRedirects = {
+        'user': '/home',
+        'admin': '/dashboard'
+      };
+
+      const roleName = user.role.name;
+      const redirectUrl = roleRedirects[roleName];
+
+      if (redirectUrl && !request.nextUrl.pathname.startsWith(redirectUrl)) {
+        return NextResponse.redirect(new URL(redirectUrl, request.url));
+      }else{
+        request.headers.set("x-user-id", user.id);
+        return NextResponse.next();
+      }
+    }catch (e) {
+      console.log(e);
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
   }
 
   return NextResponse.next();

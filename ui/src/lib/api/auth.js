@@ -12,8 +12,13 @@ export const AuthApiClient = {
     return res.data;
   },
 
-  getProfile: async () => {
-    const res = await apiClient.get("/auth");
+  getProfile: async (cookie) => {
+    const res = await apiClient.get("/auth",{
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie": cookie,
+      },
+    });
     return res.data; // User profile
   },
 };

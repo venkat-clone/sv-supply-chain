@@ -46,17 +46,19 @@ const createUser = async (data, role,vehicle,Location) => {
     });
 };
 
+
 const getUserById = async (id) => {
     console.log(`[UserRepository] Getting User by id: ${id}`);
 
     return prisma.user.findUnique({
-      where: { id: Number(id) },
-      omit: {
-        password: true,
-      },
-      include: {
-        role: true,
-      },
+      where: { id: id },
+        select:{
+            id: true,
+            name: true,
+            phone: true,
+            role: true,
+            createdAt:true
+        }
     });
 };
 

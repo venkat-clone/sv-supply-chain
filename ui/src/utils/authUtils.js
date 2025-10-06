@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 
+import { jwtVerify } from 'jose';
 // Secret key for JWT signing (this should be stored in an environment variable in production)
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
@@ -16,10 +16,13 @@ export function getTokenFromHeader(request) {
 }
 
 // Function to verify and decode the JWT token
-export function verifyToken(token) {
+export async function verifyToken(token) {
     try {
         // Verify the JWT token using the secret key and return the decoded user info
-        return jwt.verify(token, JWT_SECRET); // Assuming the token contains user id and email
+        // return jwt.verify(token, JWT_SECRET); // Assuming the token contains user id and email
+
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+        return  payload;
     } catch (error) {
         console.error("Token verification failed:", error);
         return null;

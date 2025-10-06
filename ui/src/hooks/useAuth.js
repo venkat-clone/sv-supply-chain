@@ -1,21 +1,15 @@
 // hooks/useAuth.js
 import { useEffect, useState } from "react";
-import { AuthApiClient } from "@/api/AuthApiClient";
+import { AuthApiClient } from "@/lib/api/auth";
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const loadUser = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
 
     try {
-      const res = await AuthApiClient.getProfile(token); // send token
+      const res = await AuthApiClient.getProfile(); // send token
       setUser(res.user || res);
     } catch {
       setUser(null);

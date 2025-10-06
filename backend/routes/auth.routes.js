@@ -4,11 +4,12 @@ const { validateRequest } = require('../utils/utils');
 const { RegisterSchema, LoginSchema } = require("../validation/AuthValidation");
 const AuthController = require("../controllers/AuthController");
 const fs = require("node:fs");
+const authMiddleware = require("../middleware/authMiddleware");
 
 
 
 
-router.get('/', AuthController.getProfile);
+router.get('/',authMiddleware, AuthController.getProfile);
 router.post(
   "/register",
   validateRequest(RegisterSchema),
