@@ -1,15 +1,17 @@
 "use client";
-import { Geist, Geist_Mono } from "next/font/google";
+import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {Toaster} from "sonner";
+
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 // export const metadata = {
@@ -19,18 +21,31 @@ const geistMono = Geist_Mono({
 const queryClient = new QueryClient();
 
 
-export default function RootLayout({ children }) {
-  return (
-      <QueryClientProvider client={queryClient}>
+export default function RootLayout({children}) {
+    return (
 
-      <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-      </QueryClientProvider>
+        <html lang="en">
+        <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+        <QueryClientProvider client={queryClient}>
+            {children}
+            <Toaster
+                closeButton
+                richColors
+                toastOptions={{
+                    className: "rounded-md shadow-lg border p-4",
+                    style: {
+                        fontSize: "14px",
+                    },
+                }}
+                position="top-right"
+                duration={3000}
+            />
+        </QueryClientProvider>
+        </body>
+        </html>
 
-  );
+
+    );
 }

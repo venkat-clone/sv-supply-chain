@@ -12,7 +12,13 @@ const getOrderList = async (where, skip, take, orderBy) => {
     skip,
     take,
     orderBy,
-    include: {},
+    include: {
+      driver:true,
+      vehicle:true,
+      fromLocation:true,
+      toLocation:true,
+
+    },
   };
 
   const [Orders, count] = await prisma.$transaction([

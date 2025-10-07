@@ -10,7 +10,7 @@ export const useAuth = () => {
 
     try {
       const res = await AuthApiClient.getProfile(); // send token
-      setUser(res.user || res);
+      setUser(res);
     } catch {
       setUser(null);
     } finally {
